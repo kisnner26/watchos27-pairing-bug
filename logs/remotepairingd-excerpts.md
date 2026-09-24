@@ -27,12 +27,13 @@ Source: `log show --predicate 'process == "remotepairingd" OR process == "Device
 
 Summary of the four sessions (`setupManualPairing`, initiated by the watch over `awdl0` after the Device Hub sheet is open):
 
-| Session | `PairSetup … client authenticated` | `Pairing session … succeeded` | Channel invalidated |
-|---|---|---|---|
-| tcp-9  | 10:02:20.802 | 10:02:20.802 | 10:02:21.133 |
-| tcp-10 | 10:03:23.xxx | 10:03:23.xxx | 10:03:24.xxx |
-| tcp-12 | 10:14:12.xxx | 10:14:12.xxx | 10:14:12.xxx |
-| tcp-13 | 10:15:22.400 | 10:15:22.400 | 10:15:22.442 |
+| Session | `PairSetup … client authenticated` | `Pairing session … succeeded` | Channel invalidated | Reconnect |
+|---|---|---|---|---|
+| tcp-9  | 10:02:20.802 | 10:02:20.802 | 10:02:21.133 | none |
+| tcp-10 | 10:03:23.xxx | 10:03:23.xxx | 10:03:24.xxx | none |
+| tcp-12 | 10:14:12.xxx | 10:14:12.xxx | 10:14:12.xxx | none |
+| tcp-13 | 10:15:22.400 | 10:15:22.400 | 10:15:22.442 | none |
+| tcp-9 (after watch update) | 10:55:08.951 | 10:55:08.951 | 10:55:08.980 | none |
 
 (An earlier session, tcp-8 at 10:01:36, ended in `PairSetup server wrong setup code` ×2 — a mistyped code — and is not part of the failure.)
 
@@ -75,16 +76,37 @@ $ xcrun devicectl manage pair --device <watch udid>
 ERROR: The specified device was not found. (com.apple.dt.CoreDeviceError error 1000 (0x3E8))
 ```
 
-## D. Control case: the iPad (same daemon, same time)
+## D. Control case: the iPhone, same Mac, one minute earlier
+
+The iPhone had also lost trust (*Reset Location & Privacy*) and was re-paired first. It shows the **same** short setup channel,
+followed by a normal reconnect:
 
 ```
-10:13:35 remotepairingd  tcp-11 (default-…): Pairing session of kind Optional(RemotePairing.PairingData.Kind.verifyManualPairing) succeeded
-10:13:35 remotepairingd  Re-playing discovery of unauth bonjour devices as new pairing for device with udid Optional("00008103-…") has been added
-…
-10:22:15 remotepairingd  tcp-11 (00008103-…/ccon_…): ControlChannel connection state changing from authenticated to invalidated   (≈9 minutes later)
+10:54:15.768 DeviceHub       Presenting pairing challenge for "<iPhone name>"
+10:54:22.171 remotepairingd  Re-playing discovery of unauth bonjour devices as new pairing for device with udid Optional("00008130-…") has been added
+10:54:22.173 remotepairingd  tcp-7 (ccon_…): Pairing session of kind … setupManualPairing succeeded
+10:54:22.209 remotepairingd  tcp-7: received error reading message: <private>                    <-- +36 ms
+10:54:22.209 remotepairingd  tcp-7 (00008130-…/ccon_…): ControlChannel … authenticated -> invalidated
+10:54:22.508 DeviceHub       Beaconing pairing session explicitly ended by client
+10:54:23.567 remotepairingd  tcp-8 (default-…): ControlChannel … handshakeInProgress -> preparingPairingSession(… verifyManualPairing …)
+10:54:23.592 remotepairingd  tcp-8 (00008130-…/default-…): Pairing session of kind … verifyManualPairing succeeded   <-- reconnect (+1.4 s)
 ```
 
-The iPad's control channel stays `authenticated` for minutes; the watch's lasts about 40 ms.
+`xcrun devicectl list devices` then shows the iPhone as `connected`, and Device Hub lists it as available.
+
+The watch, one minute later (10:55:08), goes through the identical first half and then **nothing**:
+
+```
+10:55:04.327 DeviceHub       Presenting pairing challenge for "<watch name>"
+10:55:08.951 remotepairingd  Re-playing discovery of unauth bonjour devices as new pairing for device with udid Optional("00008310-…") has been added
+10:55:08.951 remotepairingd  tcp-9 (ccon_…): Pairing session of kind … setupManualPairing succeeded
+10:55:08.980 remotepairingd  tcp-9 (00008310-…/ccon_…): Invalidating control channel connection due to reason: <private>   <-- +29 ms
+10:55:09.266 DeviceHub       Beaconing pairing session explicitly ended by client
+(no further lines about 00008310-… — no verifyManualPairing, no Bonjour advertisement)
+```
+
+> Correction: an earlier revision showed an iPad `verifyManualPairing` as the control. That was a *reconnect* of an already-paired
+> device, not a fresh setup, so it was not a valid comparison. The iPhone above is.
 
 ## E. Not the watch-only advertising
 

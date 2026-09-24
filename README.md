@@ -1,14 +1,19 @@
-# Apple Watch drops the connection right after a successful pairing (watchOS 27 + Xcode 27 / Device Hub)
+# Apple Watch never reconnects after a successful manual pairing (watchOS 27 + Xcode 27 / Device Hub)
 
 🇪🇸 [Leer en español](README.es.md)
 
 > **Status: open · investigating.** Last updated 2026-09-24.
-> Retest pending on **watchOS 27.2 beta 2**. Results will be added to [`docs/status-log.md`](docs/status-log.md).
+> Retested after updating the watch (reported as **watchOS 27.2 beta 2**): same behavior. See [`docs/status-log.md`](docs/status-log.md).
+>
+> ⚠️ **Correction (2026-09-24):** an earlier revision of this write-up treated the ~40 ms disconnect after pairing as the fault.
+> A control run with the iPhone shows that disconnect is **normal**; the real fault is that the watch **never reconnects afterwards**.
 
 An Apple Watch Ultra 2 that used to work as an Xcode run destination **disappeared from the Mac**
 (`devicectl` first listed it as `unavailable`, then not at all). Re-pairing it from **Device Hub**
-(*File ▸ Pair Nearby Device…*) **succeeds**, but **~40 ms later the watch closes the TCP connection**,
-so CoreDevice never creates a device record and the watch never becomes available again.
+(*File ▸ Pair Nearby Device…*) **succeeds** (PairSetup M1–M6, `setupManualPairing succeeded`). The setup channel is then
+closed within ~30–40 ms — which also happens to an iPhone, that **reconnects ~1.3 s later** (`verifyManualPairing`) and becomes
+available. The watch **never reconnects**: no `verifyManualPairing`, no `_remotepairing._tcp` advertisement, and CoreDevice never
+creates a device record for it.
 
 This repository documents the symptoms, the log evidence, everything that was tried, and a ready-to-file
 Feedback Assistant report. Personal identifiers (UDIDs, device names, network addresses) are redacted.
@@ -53,8 +58,9 @@ Attempting to bootstrap pairing using MobileDevice for device with UDID <private
 Device <private> supports user-driven network pairing flows. Skipping companion proxy bootstrap pairing
 ```
 
-**3. Manual pairing succeeds, then the watch hangs up.** From Device Hub, four attempts
-(10:02, 10:03, 10:14, 10:15 local time) all followed the same sequence — here the last one:
+**3. Manual pairing succeeds, the setup channel closes, and the watch never comes back.**
+Five watch attempts (10:02, 10:03, 10:14, 10:15 on watchOS 27.0; 10:55 after the update) all followed the same sequence.
+Here is the 10:15 one in detail:
 
 ```
 10:15:14.xxx DeviceHub   Presenting pairing challenge for "<watch name>"
@@ -70,12 +76,19 @@ Device <private> supports user-driven network pairing flows. Skipping companion 
 10:15:22.713 DeviceHub   Beaconing pairing session explicitly ended by client
 ```
 
-The SRP pairing (M1–M6) completes and the host stores the new pairing, but the peer resets the TCP
-connection immediately afterwards. Device Hub then ends the session, and a follow-up
-`AcquireDeviceUsageAssertion` fails with *"The specified device was not found" (1000)*.
+The SRP pairing (M1–M6) completes and the host stores the new pairing; the peer then closes the setup connection.
+Device Hub ends the session and a follow-up `AcquireDeviceUsageAssertion` fails with *"The specified device was not found" (1000)*.
 
-**4. Control case: the iPad works.** The same daemon completes `verifyManualPairing` for the iPad
-and keeps its control channel `authenticated`. Only the watch is dropped.
+**4. Control case (iPhone, same Mac, same minute).** After *Reset Location & Privacy* the iPhone also had to be re-paired. It behaves
+identically for the first 30 ms, and then recovers:
+
+| | setup succeeded | setup channel closed | reconnect |
+|---|---|---|---|
+| iPhone | 10:54:22.173 | 10:54:22.209 (**+36 ms**) | **10:54:23.592** `verifyManualPairing succeeded` (+1.4 s) → *available* |
+| Watch  | 10:55:08.951 | 10:55:08.980 (**+29 ms**) | **none** — and nothing advertises on Bonjour |
+
+So the ~40 ms close is expected. What is missing is the watch's reconnection (and its own advertisement) that the iPhone performs.
+(An earlier revision used an iPad `verifyManualPairing` as the control; that was a reconnect, not a setup, so it was not a valid comparison.)
 
 ## Timeline (local time, UTC−6)
 
@@ -85,8 +98,10 @@ and keeps its control channel `authenticated`. Only the watch is dropped.
 | 06:05 | First observation: watch is `unavailable`. |
 | 09:33 | `remotepairingd` tries to remove the watch's pairing record. Watch disappears from `devicectl`. |
 | 09:37 | iPhone on USB: watch seen as proxied device; automatic pairing skipped (see above). |
-| 10:02 – 10:15 | Four manual pairings from Device Hub: each succeeds, each is cut ~40 ms later. |
-| later | *Reset Location & Privacy* on the iPhone; watchOS update to 27.2 beta 2 started. |
+| 10:02 – 10:15 | Four manual pairings from Device Hub: each succeeds; the watch never reconnects. |
+| later | *Reset Location & Privacy* on the iPhone; watch updated (reported 27.2 beta 2). |
+| 10:54 | iPhone re-paired: setup → close (+36 ms) → **reconnects** → available. |
+| 10:55 | Watch re-paired on the updated watchOS: setup → close (+29 ms) → **no reconnect**. |
 
 ## What is *not* the problem
 
@@ -100,12 +115,13 @@ See [`docs/what-i-tried.md`](docs/what-i-tried.md) for the full list.
 
 ## Hypotheses
 
-1. **Out-of-sync pairing state.** The Mac dropped its record (09:33) without the watch forgetting the Mac.
-   A new setup then conflicts with the watch's old record and the watch aborts after M6.
-2. **watchOS 27.0 beta bug** in the step that follows PairSetup (persisting the pairing / opening the
-   control channel). This would also fit the watch rebooting when an install is requested from the iPhone.
+1. **The watch does not announce itself after setup.** Nothing on Bonjour (`_remotepairing._tcp`), and `remotepairingd` never logs a
+   Bluetooth `NearbyInfo` resolved to the watch's identity, so the Mac has nothing to reconnect to.
+2. **CoreDevice needs a verified connection to create the device record**, so a watch that never reconnects stays invisible.
+3. **Watches rely on the companion iPhone path**, which watchOS 27 marks as "user-driven" and the Mac skips
+   (`Skipping companion proxy bootstrap pairing`), leaving no automatic route to the watch.
 
-Neither is confirmed. Retest on watchOS 27.2 beta 2 will help separate them.
+None is confirmed. The 27.2 beta 2 retest did not change the behavior.
 
 ## Reproduce / gather evidence
 

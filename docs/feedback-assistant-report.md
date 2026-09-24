@@ -2,14 +2,15 @@
 
 **Area:** Developer Tools ▸ Xcode ▸ Devices (Device Hub) — also relevant to watchOS ▸ Developer Mode
 **Type:** Incorrect / Unexpected Behavior
-**Title:** Apple Watch closes the control channel ~40 ms after a successful manual pairing (Device Hub, watchOS 27); CoreDevice never creates the device
+**Title:** Apple Watch never reconnects after a successful manual pairing (Device Hub, watchOS 27); CoreDevice never creates the device
 
 ## Summary
 
 After CoreDevice dropped its record of an Apple Watch Ultra 2, re-pairing it from Device Hub
 (*File ▸ Pair Nearby Device…*) completes PairSetup (M1–M6) and reports `Pairing session of kind setupManualPairing succeeded`,
-but the watch resets the TCP connection ~40 ms later. `remotepairingd` invalidates the control channel, Device Hub ends
-the session, and the watch never appears in `devicectl list devices`. The watch is unusable as a run destination.
+and the setup channel closes ~30 ms later (as it does for an iPhone). The iPhone then reconnects within ~1.4 s
+(`verifyManualPairing succeeded`) and becomes available; the watch **never reconnects** and does not advertise
+`_remotepairing._tcp`. It never appears in `devicectl list devices`, so it is unusable as a run destination.
 
 ## Steps to reproduce
 
@@ -22,17 +23,19 @@ the session, and the watch never appears in `devicectl list devices`. The watch 
 
 ## Expected
 
-The watch connection stays `authenticated`; CoreDevice creates a device record; the watch is `available`
-and can receive apps.
+After the setup channel closes, the watch reconnects (`verifyManualPairing`), CoreDevice creates a device record, and the watch
+is `available` and can receive apps — as an iPhone does in the same situation.
 
 ## Actual
 
 * `PairSetup server done -- client authenticated`, `Pairing session … succeeded`, state `authenticated`.
-* ~40 ms later: `tcp-N: received error reading message`, `Invalidating control channel connection`, state `invalidated`.
+* ~30 ms later: `tcp-N: received error reading message`, state `invalidated` (also seen with an iPhone — expected).
+* **Control (iPhone):** +1.4 s later `verifyManualPairing … succeeded`; device becomes available. **Watch: nothing follows.**
 * Device Hub: `Beaconing pairing session explicitly ended by client`; a later `AcquireDeviceUsageAssertion` fails with
   `The specified device was not found (1000)`.
 * `xcrun devicectl list devices` has no watch entry; `xcrun devicectl manage pair --device <udid>` → error 1000.
-* Reproduced 4 times in ~15 minutes. An iPad on the same Mac completes `verifyManualPairing` and stays `authenticated`.
+* No `_remotepairing._tcp` / `_remotepairing-manual-pairing._tcp` advertisement from the watch after pairing.
+* Reproduced 5 times, including on the updated watchOS (reported 27.2 beta 2).
 
 Also, with the iPhone on USB the Mac attaches the watch as a *proxied device* and logs
 `Device … supports user-driven network pairing flows. Skipping companion proxy bootstrap pairing`.
@@ -43,7 +46,7 @@ Installing from the iPhone Watch app ▸ Install fills ~50 %, then stalls and th
 * macOS 27.2 (26B5086k), MacBook Pro (MacBookPro17,1, M1)
 * Xcode 27.0 (27A5237l), Device Hub
 * iPhone 15 Pro Max (iPhone16,2), iOS 27.0
-* Apple Watch Ultra 2 (Watch7,5), watchOS 27.0 → retest on 27.2 beta 2 pending
+* Apple Watch Ultra 2 (Watch7,5), watchOS 27.0, then updated (reported 27.2 beta 2): same behavior
 * Free Apple Developer account
 
 ## Attachments to include

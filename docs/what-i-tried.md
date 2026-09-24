@@ -15,7 +15,8 @@ Everything below was done with the symptoms described in the [README](../README.
 | Watch on the same Wi-Fi network / band as the Mac | ✅ no change |
 | Personal Hotspot from the iPhone for all three devices | not tested |
 | *Reset Location & Privacy* on the iPhone (clears trusted computers) | ✅ done; effect pending |
-| Update the watch to watchOS 27.2 beta 2 | in progress |
+| Update the watch to watchOS 27.2 beta 2 | ✅ done (reported); re-pairing shows the same result: no reconnect |
+| Re-pair the **iPhone** after the privacy reset (control) | ✅ works: setup → reconnect (`verifyManualPairing`) → available |
 
 ## Mac
 

@@ -1,14 +1,18 @@
-# El Apple Watch corta la conexión justo después de emparejarse bien (watchOS 27 + Xcode 27 / Device Hub)
+# El Apple Watch nunca se reconecta después de emparejarse bien (watchOS 27 + Xcode 27 / Device Hub)
 
 🇬🇧 [Read in English](README.md)
 
 > **Estado: abierto · en investigación.** Última actualización: 2026-09-24.
-> Falta repetir la prueba en **watchOS 27.2 beta 2**. Los resultados irán en [`docs/status-log.md`](docs/status-log.md).
+> Se repitió la prueba tras actualizar el reloj (reportado como **watchOS 27.2 beta 2**): mismo comportamiento. Ver [`docs/status-log.md`](docs/status-log.md).
+>
+> ⚠️ **Corrección (2026-09-24):** una versión anterior de este texto trataba el corte de ~40 ms como la falla.
+> Un control con el iPhone muestra que ese corte es **normal**; la falla real es que el reloj **nunca se reconecta después**.
 
 Un Apple Watch Ultra 2 que funcionaba como destino de ejecución en Xcode **desapareció de la Mac**
 (`devicectl` primero lo mostró como `unavailable` y luego dejó de listarlo). Al re-emparejarlo desde
-**Device Hub** (*File ▸ Pair Nearby Device…*) el emparejamiento **sale bien**, pero **~40 ms después el reloj
-cierra la conexión TCP**, así que CoreDevice nunca crea el registro del dispositivo y el reloj no vuelve a estar disponible.
+**Device Hub** (*File ▸ Pair Nearby Device…*) el emparejamiento **sale bien**. El canal de configuración se cierra a los ~30–40 ms
+(algo que también le pasa al iPhone, que **se reconecta ~1,3 s después** y queda disponible). El reloj **nunca se reconecta**:
+no hay `verifyManualPairing`, no anuncia `_remotepairing._tcp` y CoreDevice nunca crea su registro.
 
 Este repositorio documenta los síntomas, la evidencia en los registros, todo lo que se probó y un
 reporte listo para Feedback Assistant. Los datos personales (UDID, nombres, direcciones de red) están ocultos.
@@ -44,12 +48,18 @@ Extractos completos (sin datos personales): [`logs/remotepairingd-excerpts.md`](
 2. **watchOS 27 exige un emparejamiento iniciado por el usuario y se salta el automático:**
    `Device <private> supports user-driven network pairing flows. Skipping companion proxy bootstrap pairing`
    (con el iPhone por USB la Mac ve el reloj como *proxied device* y se rinde).
-3. **El emparejamiento manual funciona y el reloj cuelga.** Cuatro intentos desde Device Hub (10:02, 10:03,
-   10:14, 10:15) terminan igual: PairSetup M1–M6 completo, `Pairing session … succeeded`, estado
-   `authenticated`, y **40 ms después** `received error reading message` → canal `invalidated`.
-   Device Hub cierra la sesión y CoreDevice nunca crea el dispositivo.
-4. **Caso de control:** con el iPad, el mismo servicio completa `verifyManualPairing` y mantiene el canal
-   `authenticated`. Solo el reloj se cae.
+3. **El emparejamiento manual funciona, el canal se cierra y el reloj no vuelve.** Cinco intentos (10:02, 10:03, 10:14,
+   10:15 con watchOS 27.0; 10:55 tras actualizar): PairSetup M1–M6 completo, `Pairing session … succeeded`, `authenticated`,
+   y a los ~30–40 ms `received error reading message` → canal `invalidated`. CoreDevice nunca crea el dispositivo.
+4. **Caso de control (iPhone, misma Mac, mismo minuto).** Tras *Restablecer ubicación y privacidad* el iPhone también hubo que
+   re-emparejarlo. Los primeros 30 ms son idénticos y luego se recupera:
+
+   | | setup exitoso | canal cerrado | reconexión |
+   |---|---|---|---|
+   | iPhone | 10:54:22.173 | 10:54:22.209 (**+36 ms**) | **10:54:23.592** `verifyManualPairing succeeded` → *disponible* |
+   | Reloj  | 10:55:08.951 | 10:55:08.980 (**+29 ms**) | **ninguna**; nada se anuncia por Bonjour |
+
+   Es decir, el corte de ~40 ms es lo esperado. Lo que falta es la reconexión (y el anuncio) del reloj.
 
 ## Lo que NO es el problema
 
@@ -62,11 +72,11 @@ Lista completa en [`docs/what-i-tried.md`](docs/what-i-tried.md).
 
 ## Hipótesis
 
-1. **Estado de emparejamiento desincronizado:** la Mac borró su registro sin que el reloj olvidara la Mac;
-   el emparejamiento nuevo choca con el viejo y el reloj aborta tras M6.
-2. **Bug de watchOS 27.0 beta** en el paso posterior a PairSetup. Encajaría con el reinicio del reloj al instalar.
+1. **El reloj no se anuncia después del setup** (nada en Bonjour; `remotepairingd` nunca resuelve un `NearbyInfo` Bluetooth a su identidad).
+2. **CoreDevice necesita una conexión verificada para crear el dispositivo**, así que un reloj que no se reconecta queda invisible.
+3. **Los relojes dependen de la ruta del iPhone acompañante**, que la Mac se salta (`Skipping companion proxy bootstrap pairing`).
 
-Ninguna está confirmada.
+Ninguna está confirmada. La prueba con la actualización no cambió el comportamiento.
 
 ## Reporte a Apple
 

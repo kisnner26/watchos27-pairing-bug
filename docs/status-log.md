@@ -2,6 +2,16 @@
 
 Newest first. Times are local (UTC−6).
 
+## 2026-09-24 (after the watch update)
+
+* Watch updated (reported as watchOS 27.2 beta 2). *Reset Location & Privacy* had already been done on the iPhone.
+* **iPhone re-paired** with *Pair Nearby Device…*: setup → channel closes at +36 ms → **`verifyManualPairing` at +1.4 s → available**.
+* **Watch re-paired** the same way: setup succeeded at 10:55:08 → channel closes at +29 ms → **no reconnect**, no Bonjour advertisement,
+  no CoreDevice record. Behavior unchanged from watchOS 27.0.
+* **Correction:** the ~40 ms close is normal (the iPhone shows it too). The fault is the missing reconnection. README, logs and the
+  Feedback report were rewritten accordingly.
+* Note: the pairing code is shown **on the Mac** and typed **on the device**.
+
 ## 2026-09-24
 
 * **Cleanup of the Mac side.** The watch's pairing record is stored in SIP-protected locations (no files named by UDID
