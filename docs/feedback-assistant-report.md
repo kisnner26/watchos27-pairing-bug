@@ -35,7 +35,7 @@ is `available` and can receive apps — as an iPhone does in the same situation.
   `The specified device was not found (1000)`.
 * `xcrun devicectl list devices` has no watch entry; `xcrun devicectl manage pair --device <udid>` → error 1000.
 * No `_remotepairing._tcp` / `_remotepairing-manual-pairing._tcp` advertisement from the watch after pairing.
-* Reproduced 5 times, including on the updated watchOS (reported 27.2 beta 2).
+* Reproduced 5 times, including on the updated watchOS (27.2, build 24S5091f).
 
 Also, with the iPhone on USB the Mac attaches the watch as a *proxied device* and logs
 `Device … supports user-driven network pairing flows. Skipping companion proxy bootstrap pairing`.
@@ -46,7 +46,7 @@ Installing from the iPhone Watch app ▸ Install fills ~50 %, then stalls and th
 * macOS 27.2 (26B5086k), MacBook Pro (MacBookPro17,1, M1)
 * Xcode 27.0 (27A5237l), Device Hub
 * iPhone 15 Pro Max (iPhone16,2), iOS 27.0
-* Apple Watch Ultra 2 (Watch7,5), watchOS 27.0, then updated (reported 27.2 beta 2): same behavior
+* Apple Watch Ultra 2 (Watch7,5), watchOS 27.0, then updated to 27.2 (24S5091f): same behavior
 * Free Apple Developer account
 
 ## Attachments to include

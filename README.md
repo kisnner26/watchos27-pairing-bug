@@ -3,7 +3,7 @@
 🇪🇸 [Leer en español](README.es.md)
 
 > **Status: open · investigating.** Last updated 2026-09-24.
-> Retested after updating the watch (reported as **watchOS 27.2 beta 2**): same behavior. See [`docs/status-log.md`](docs/status-log.md).
+> Retested after updating the watch (**watchOS 27.2, build 24S5091f**): same behavior. See [`docs/status-log.md`](docs/status-log.md).
 >
 > ⚠️ **Correction (2026-09-24):** an earlier revision of this write-up treated the ~40 ms disconnect after pairing as the fault.
 > A control run with the iPhone shows that disconnect is **normal**; the real fault is that the watch **never reconnects afterwards**.
@@ -25,7 +25,7 @@ Feedback Assistant report. Personal identifiers (UDIDs, device names, network ad
 | Mac | MacBook Pro (`MacBookPro17,1`, Apple M1), macOS 27.2 (`26B5086k`) |
 | Xcode | 27.0 (`27A5237l`) — Devices are now managed by the separate **Device Hub** app |
 | iPhone | iPhone 15 Pro Max (`iPhone16,2`), iOS 27.0 |
-| Watch | Apple Watch Ultra 2 (`Watch7,5`), watchOS 27.0 (being updated to 27.2 beta 2) |
+| Watch | Apple Watch Ultra 2 (`Watch7,5`), watchOS 27.0 → updated to **27.2 (24S5091f)** |
 | Signing | Free Apple Developer account (Personal Team) |
 | Pairing | The watch is a *manually paired* device in CoreDevice (`Authentication Type: manualPairing`) |
 
@@ -99,7 +99,7 @@ So the ~40 ms close is expected. What is missing is the watch's reconnection (an
 | 09:33 | `remotepairingd` tries to remove the watch's pairing record. Watch disappears from `devicectl`. |
 | 09:37 | iPhone on USB: watch seen as proxied device; automatic pairing skipped (see above). |
 | 10:02 – 10:15 | Four manual pairings from Device Hub: each succeeds; the watch never reconnects. |
-| later | *Reset Location & Privacy* on the iPhone; watch updated (reported 27.2 beta 2). |
+| later | *Reset Location & Privacy* on the iPhone; watch updated to 27.2 (24S5091f). |
 | 10:54 | iPhone re-paired: setup → close (+36 ms) → **reconnects** → available. |
 | 10:55 | Watch re-paired on the updated watchOS: setup → close (+29 ms) → **no reconnect**. |
 
@@ -121,7 +121,7 @@ See [`docs/what-i-tried.md`](docs/what-i-tried.md) for the full list.
 3. **Watches rely on the companion iPhone path**, which watchOS 27 marks as "user-driven" and the Mac skips
    (`Skipping companion proxy bootstrap pairing`), leaving no automatic route to the watch.
 
-None is confirmed. The 27.2 beta 2 retest did not change the behavior.
+None is confirmed. The retest on watchOS 27.2 (24S5091f) did not change the behavior.
 
 ## Reproduce / gather evidence
 

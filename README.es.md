@@ -3,7 +3,7 @@
 🇬🇧 [Read in English](README.md)
 
 > **Estado: abierto · en investigación.** Última actualización: 2026-09-24.
-> Se repitió la prueba tras actualizar el reloj (reportado como **watchOS 27.2 beta 2**): mismo comportamiento. Ver [`docs/status-log.md`](docs/status-log.md).
+> Se repitió la prueba tras actualizar el reloj (**watchOS 27.2, compilación 24S5091f**): mismo comportamiento. Ver [`docs/status-log.md`](docs/status-log.md).
 >
 > ⚠️ **Corrección (2026-09-24):** una versión anterior de este texto trataba el corte de ~40 ms como la falla.
 > Un control con el iPhone muestra que ese corte es **normal**; la falla real es que el reloj **nunca se reconecta después**.
@@ -24,7 +24,7 @@ reporte listo para Feedback Assistant. Los datos personales (UDID, nombres, dire
 | Mac | MacBook Pro (`MacBookPro17,1`, Apple M1), macOS 27.2 (`26B5086k`) |
 | Xcode | 27.0 (`27A5237l`) — los dispositivos ahora se manejan en la app aparte **Device Hub** |
 | iPhone | iPhone 15 Pro Max (`iPhone16,2`), iOS 27.0 |
-| Reloj | Apple Watch Ultra 2 (`Watch7,5`), watchOS 27.0 (actualizando a 27.2 beta 2) |
+| Reloj | Apple Watch Ultra 2 (`Watch7,5`), watchOS 27.0 → actualizado a **27.2 (24S5091f)** |
 | Firma | Cuenta gratuita de Apple Developer (Personal Team) |
 | Emparejamiento | El reloj es un dispositivo *emparejado manualmente* en CoreDevice (`manualPairing`) |
 

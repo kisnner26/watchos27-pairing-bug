@@ -4,7 +4,7 @@ Newest first. Times are local (UTC−6).
 
 ## 2026-09-24 (after the watch update)
 
-* Watch updated (reported as watchOS 27.2 beta 2). *Reset Location & Privacy* had already been done on the iPhone.
+* Watch updated and confirmed in Settings ▸ General ▸ About: **watchOS 27.2, build 24S5091f**. *Reset Location & Privacy* had already been done on the iPhone.
 * **iPhone re-paired** with *Pair Nearby Device…*: setup → channel closes at +36 ms → **`verifyManualPairing` at +1.4 s → available**.
 * **Watch re-paired** the same way: setup succeeded at 10:55:08 → channel closes at +29 ms → **no reconnect**, no Bonjour advertisement,
   no CoreDevice record. Behavior unchanged from watchOS 27.0.
@@ -17,7 +17,7 @@ Newest first. Times are local (UTC−6).
 * **Cleanup of the Mac side.** The watch's pairing record is stored in SIP-protected locations (no files named by UDID
   under `/var/db`, `/Library/Apple`). `remotepairingd` was restarted; the Mac now has no record of the watch.
 * **iPhone:** *Reset Location & Privacy* done (clears trusted computers).
-* **Watch:** update to **watchOS 27.2 beta 2** started.
+* **Watch:** update to **watchOS 27.2** started.
 * **Next:** after the update, repeat *Pair Nearby Device…* and check whether the control channel stays `authenticated`
   past the first second. Outcome will be recorded here.
 
