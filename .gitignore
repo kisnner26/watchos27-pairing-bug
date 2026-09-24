@@ -1,0 +1,5 @@
+.DS_Store
+*.logarchive
+*.tracev3
+*.sysdiagnose*
+*.tar.gz
