@@ -3,6 +3,7 @@
 🇬🇧 [Read in English](README.md)
 
 > **Estado: abierto · en investigación.** Última actualización: 2026-09-24.
+> **Reportado a Apple:** Feedback Assistant **FB24924229** (2026-09-24). Si te pasa lo mismo, abre tu propio reporte y menciona ese número.
 > Se repitió la prueba tras actualizar el reloj (**watchOS 27.2, compilación 24S5091f**): mismo comportamiento. Ver [`docs/status-log.md`](docs/status-log.md).
 >
 > ⚠️ **Corrección (2026-09-24):** una versión anterior de este texto trataba el corte de ~40 ms como la falla.

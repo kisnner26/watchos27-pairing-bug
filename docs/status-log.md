@@ -2,6 +2,11 @@
 
 Newest first. Times are local (UTC−6).
 
+## 2026-09-24 (report filed)
+
+* Filed in Feedback Assistant as **FB24924229** (Xcode ▸ Incorrect/Unexpected Behaviour), with a macOS sysdiagnose attached automatically.
+  No sysdiagnose from the watch was attached.
+
 ## 2026-09-24 (after the watch update)
 
 * Watch updated and confirmed in Settings ▸ General ▸ About: **watchOS 27.2, build 24S5091f**. *Reset Location & Privacy* had already been done on the iPhone.

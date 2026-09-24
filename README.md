@@ -3,6 +3,7 @@
 🇪🇸 [Leer en español](README.es.md)
 
 > **Status: open · investigating.** Last updated 2026-09-24.
+> **Reported to Apple:** Feedback Assistant **FB24924229** (2026-09-24). If you hit the same problem, please file your own report and mention that number.
 > Retested after updating the watch (**watchOS 27.2, build 24S5091f**): same behavior. See [`docs/status-log.md`](docs/status-log.md).
 >
 > ⚠️ **Correction (2026-09-24):** an earlier revision of this write-up treated the ~40 ms disconnect after pairing as the fault.

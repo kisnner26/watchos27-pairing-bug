@@ -1,4 +1,6 @@
-# Feedback Assistant report (ready to file)
+# Feedback Assistant report
+
+Filed as **FB24924229** on 2026-09-24. Text below is what was submitted (plus a macOS sysdiagnose).
 
 **Area:** Developer Tools ▸ Xcode ▸ Devices (Device Hub) — also relevant to watchOS ▸ Developer Mode
 **Type:** Incorrect / Unexpected Behavior
