@@ -33,6 +33,18 @@ Everything below was done with the symptoms described in the [README](../README.
 | `xcrun xcdevice list`, `xcrun xctrace list devices` | ✅ watch never listed |
 | Bonjour: `dns-sd -B _remotepairing._tcp` / `_remotepairing-manual-pairing._tcp` | ✅ only iPhone and iPad advertise |
 
+## Later (2026-09-24, night)
+
+| Attempt | Result |
+|---|---|
+| Keep the Mac's pairable-host listener open after setup (reopen *Pair Nearby Device…* by hand, 15 s gap) | ✅ no reconnect within 40 s |
+| Same, automated with `tools/watch-pair-keeper.sh` (0.6 s gap) | ⚠️ the watch **reconnects**, but asks for a **new** pair-setup, not pair-verify; then closes again |
+| Watch sysdiagnose right after a failed pairing | ✅ collected; the watch log stops 7 s before the close |
+| Watch ▸ Developer ▸ *Unpair this device* (the Mac), then re-pair | ✅ no change |
+| iPhone Watch app ▸ General ▸ Reset (only offers Erase / Home Screen / Sync Data / Cellular) | not used: none clears the Mac pairing, except a full erase |
+| pymobiledevice3 11.19.1 `remote pair-host` (independent host) | ❌ watch lists it, asks for its passcode, never connects |
+| Same, listening/advertising IPv4 + IPv6 (`tools/pair_host_dualstack.py`) | ❌ same |
+
 ## The app being installed (ruled out)
 
 * Signed with an Apple Development certificate, provisioning profile includes the watch UDID.
@@ -42,6 +54,6 @@ Everything below was done with the symptoms described in the [README](../README.
 
 ## Not yet tried
 
-* Unpair the watch from the iPhone completely and set it up again (heavy; may make it vanish from Xcode).
+* Erase the watch (*Erase Apple Watch Content and Settings*) and set it up again — the only thing that clears all of the
+  watch's pairing state; heavy, and may not help if this is a beta bug.
 * Fresh macOS user account / another Mac, to separate host state from watch state.
-* `sysdiagnose` on the watch right after a failed pairing (to see why it closes the connection).

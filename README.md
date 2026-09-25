@@ -2,9 +2,12 @@
 
 🇪🇸 [Leer en español](README.es.md)
 
-> **Status: open · investigating.** Last updated 2026-09-24.
+> **Status: open · the fault is on the watch.** Last updated 2026-09-25.
 > **Reported to Apple:** Feedback Assistant **FB24924229** (2026-09-24). If you hit the same problem, please file your own report and mention that number.
 > Retested after updating the watch (**watchOS 27.2, build 24S5091f**): same behavior. See [`docs/status-log.md`](docs/status-log.md).
+>
+> 🆕 **New (2026-09-24, night):** when the Mac is kept listening, the watch **does come back — but asks for a brand-new pairing**
+> instead of verifying the one it just made. It loops: setup → close → setup. See [The pairing loop](#the-pairing-loop).
 >
 > ⚠️ **Correction (2026-09-24):** an earlier revision of this write-up treated the ~40 ms disconnect after pairing as the fault.
 > A control run with the iPhone shows that disconnect is **normal**; the real fault is that the watch **never reconnects afterwards**.
@@ -104,6 +107,33 @@ So the ~40 ms close is expected. What is missing is the watch's reconnection (an
 | 10:54 | iPhone re-paired: setup → close (+36 ms) → **reconnects** → available. |
 | 10:55 | Watch re-paired on the updated watchOS: setup → close (+29 ms) → **no reconnect**. |
 
+## The pairing loop
+
+Unlike an iPhone (which the Mac finds over `_remotepairing._tcp`), a watch pairs **into** the Mac: it connects to the Mac's
+`_remotepairing-pairable-host._tcp` listener. `remotepairingd` only runs that listener while Device Hub's
+*Pair Nearby Device…* sheet is open, and the sheet closes itself ~300–400 ms after setup. So the watch not advertising
+`_remotepairing._tcp` is probably normal.
+
+[`tools/watch-pair-keeper.sh`](tools/watch-pair-keeper.sh) reopens the sheet the moment it closes (listener gap: 0.6 s). Result:
+
+```
+22:53:00.613  setupManualPairing succeeded (watch)      → channel closed at +305 ms
+22:53:01.533  Mac listening again
+22:53:23.502  the watch connects again  ✅
+22:53:23.558  …with startNewSession: true, kind: setupManualPairing   ← a NEW pairing, not verify
+22:53:23.559  Device Hub shows a new pairing code
+22:53:33.642  setupManualPairing succeeded (watch)      → closed again at +286 ms
+```
+
+The watch reconnects, but it behaves as if it had forgotten the pairing it finished 23 seconds earlier. The Mac side
+(stores the pairing, listens) works; the watch does not keep or does not use its side. That logic lives in watchOS
+(`remotepairingdeviced`), so it cannot be fixed from the Mac.
+
+Also tried: *Unpair this device* on the watch's Developer settings, then re-pair (same); an independent host with
+**pymobiledevice3** `remote pair-host`, over IPv4 and IPv6 ([`tools/pair_host_dualstack.py`](tools/pair_host_dualstack.py)):
+the watch lists it and asks for its passcode, but never opens a connection. Details in
+[`logs/remotepairingd-excerpts.md`](logs/remotepairingd-excerpts.md) § F–I.
+
 ## What is *not* the problem
 
 * **The app being installed.** The watch app was validated: Apple Development signature, provisioning
@@ -116,13 +146,19 @@ See [`docs/what-i-tried.md`](docs/what-i-tried.md) for the full list.
 
 ## Hypotheses
 
-1. **The watch does not announce itself after setup.** Nothing on Bonjour (`_remotepairing._tcp`), and `remotepairingd` never logs a
-   Bluetooth `NearbyInfo` resolved to the watch's identity, so the Mac has nothing to reconnect to.
-2. **CoreDevice needs a verified connection to create the device record**, so a watch that never reconnects stays invisible.
-3. **Watches rely on the companion iPhone path**, which watchOS 27 marks as "user-driven" and the Mac skips
-   (`Skipping companion proxy bootstrap pairing`), leaving no automatic route to the watch.
+1. **The watch does not persist (or does not use) the host pairing after setup.** Supported by the loop above: on reconnect it
+   asks for a new pair-setup instead of pair-verify. Removing the Mac on the watch and pairing again does not change it.
+2. **CoreDevice needs a verified connection to create the device record**, so a watch that never verifies stays invisible.
+3. ~~The watch does not announce itself after setup.~~ Watches pair *into* the Mac's pairable-host listener; not advertising
+   `_remotepairing._tcp` is probably by design.
 
-None is confirmed. The retest on watchOS 27.2 (24S5091f) did not change the behavior.
+Nothing on the Mac side fixed it. The only untried step is erasing the watch; otherwise this needs a watchOS fix.
+
+## Tools
+
+* [`tools/watch-pair-keeper.sh`](tools/watch-pair-keeper.sh) — reopens Device Hub's pairing sheet right after setup and reports
+  whether the watch reconnected (needs Accessibility permission for the terminal).
+* [`tools/pair_host_dualstack.py`](tools/pair_host_dualstack.py) — pymobiledevice3 pairable host on IPv4 + IPv6.
 
 ## Reproduce / gather evidence
 

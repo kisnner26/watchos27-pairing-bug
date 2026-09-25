@@ -2,9 +2,12 @@
 
 🇬🇧 [Read in English](README.md)
 
-> **Estado: abierto · en investigación.** Última actualización: 2026-09-24.
+> **Estado: abierto · la falla está en el reloj.** Última actualización: 2026-09-25.
 > **Reportado a Apple:** Feedback Assistant **FB24924229** (2026-09-24). Si te pasa lo mismo, abre tu propio reporte y menciona ese número.
 > Se repitió la prueba tras actualizar el reloj (**watchOS 27.2, compilación 24S5091f**): mismo comportamiento. Ver [`docs/status-log.md`](docs/status-log.md).
+>
+> 🆕 **Nuevo (2026-09-24, noche):** si la Mac sigue escuchando, el reloj **sí vuelve, pero pide un emparejamiento nuevo**
+> en vez de verificar el que acaba de hacer. Entra en un bucle: setup → cierre → setup. Ver [El bucle de emparejamiento](#el-bucle-de-emparejamiento).
 >
 > ⚠️ **Corrección (2026-09-24):** una versión anterior de este texto trataba el corte de ~40 ms como la falla.
 > Un control con el iPhone muestra que ese corte es **normal**; la falla real es que el reloj **nunca se reconecta después**.
@@ -62,6 +65,33 @@ Extractos completos (sin datos personales): [`logs/remotepairingd-excerpts.md`](
 
    Es decir, el corte de ~40 ms es lo esperado. Lo que falta es la reconexión (y el anuncio) del reloj.
 
+## El bucle de emparejamiento
+
+A diferencia del iPhone (que la Mac encuentra por `_remotepairing._tcp`), el reloj se empareja **hacia** la Mac: se conecta a su
+servicio `_remotepairing-pairable-host._tcp`. `remotepairingd` solo mantiene ese servicio mientras la ventana
+*Pair Nearby Device…* de Device Hub está abierta, y la ventana se cierra sola ~300–400 ms después del setup. Así que el reloj
+no anuncie `_remotepairing._tcp` probablemente es normal.
+
+[`tools/watch-pair-keeper.sh`](tools/watch-pair-keeper.sh) reabre la ventana en cuanto se cierra (hueco de 0,6 s). Resultado:
+
+```
+22:53:00.613  setupManualPairing succeeded (reloj)      → canal cerrado a +305 ms
+22:53:01.533  la Mac vuelve a escuchar
+22:53:23.502  el reloj se conecta de nuevo  ✅
+22:53:23.558  …con startNewSession: true, kind: setupManualPairing   ← emparejamiento NUEVO, no verify
+22:53:23.559  Device Hub muestra un código nuevo
+22:53:33.642  setupManualPairing succeeded (reloj)      → cerrado otra vez a +286 ms
+```
+
+El reloj vuelve, pero actúa como si hubiera olvidado el emparejamiento que terminó 23 segundos antes. El lado de la Mac
+(guarda el emparejamiento, escucha) funciona; el reloj no conserva o no usa su parte. Esa lógica está en watchOS
+(`remotepairingdeviced`), así que no se puede arreglar desde la Mac.
+
+También se probó: *Unpair this device* en los ajustes de Desarrollador del reloj y volver a emparejar (igual); un host
+independiente con **pymobiledevice3** `remote pair-host`, por IPv4 e IPv6 ([`tools/pair_host_dualstack.py`](tools/pair_host_dualstack.py)):
+el reloj lo lista y pide su código, pero nunca abre una conexión. Detalles en
+[`logs/remotepairingd-excerpts.md`](logs/remotepairingd-excerpts.md) § F–I.
+
 ## Lo que NO es el problema
 
 * La app que se instala (firma, perfil con el UDID del reloj, IDs y versiones coinciden, build Release).
@@ -73,11 +103,19 @@ Lista completa en [`docs/what-i-tried.md`](docs/what-i-tried.md).
 
 ## Hipótesis
 
-1. **El reloj no se anuncia después del setup** (nada en Bonjour; `remotepairingd` nunca resuelve un `NearbyInfo` Bluetooth a su identidad).
-2. **CoreDevice necesita una conexión verificada para crear el dispositivo**, así que un reloj que no se reconecta queda invisible.
-3. **Los relojes dependen de la ruta del iPhone acompañante**, que la Mac se salta (`Skipping companion proxy bootstrap pairing`).
+1. **El reloj no guarda (o no usa) el emparejamiento con la Mac después del setup.** Lo respalda el bucle: al volver pide un
+   setup nuevo en vez de verify. Quitar la Mac en el reloj y volver a emparejar no lo cambia.
+2. **CoreDevice necesita una conexión verificada para crear el dispositivo**, así que un reloj que nunca se verifica queda invisible.
+3. ~~El reloj no se anuncia después del setup.~~ El reloj se empareja *hacia* la Mac; que no anuncie `_remotepairing._tcp`
+   probablemente es lo esperado.
 
-Ninguna está confirmada. La prueba con la actualización no cambió el comportamiento.
+Nada del lado de la Mac lo arregló. Lo único sin probar es borrar el reloj; si no, hace falta un arreglo en watchOS.
+
+## Herramientas
+
+* [`tools/watch-pair-keeper.sh`](tools/watch-pair-keeper.sh) — reabre la ventana de emparejamiento de Device Hub justo después
+  del setup e indica si el reloj se reconectó (necesita permiso de Accesibilidad para la terminal).
+* [`tools/pair_host_dualstack.py`](tools/pair_host_dualstack.py) — host emparejable de pymobiledevice3 por IPv4 + IPv6.
 
 ## Reporte a Apple
 

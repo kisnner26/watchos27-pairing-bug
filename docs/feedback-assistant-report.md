@@ -58,4 +58,22 @@ Installing from the iPhone Watch app ▸ Install fills ~50 %, then stalls and th
 * sysdiagnose from the **watch** (paired iPhone ▸ Watch app, or the watch side-button gesture) taken right after a failed pairing.
 * Output of `xcrun devicectl list devices --json-output -` and `xcrun xcdevice list`.
 
+## Follow-up comment for FB24924229 (2026-09-24, night)
+
+New finding: **the watch does not keep the pairing it just completed.**
+
+* Watches pair *into* the Mac's `_remotepairing-pairable-host._tcp` listener, which Device Hub stops ~300 ms after setup.
+  I kept the listener open with a script (gap 0.6 s). The watch **reconnected 23 s later**, but sent
+  `PairingData(startNewSession: true, kind: setupManualPairing)` and Device Hub presented a **new** pairing code, instead of
+  `verifyManualPairing`. After the second setup (22:53:33.642) the channel closed again at +286 ms. No `verifyManualPairing`
+  for the watch ever follows.
+* Removing the Mac on the watch (*Developer ▸ Unpair this device*) and pairing again: same.
+* An independent pairable host (pymobiledevice3 `remote pair-host`, IPv4 and IPv6) is listed by the watch, which asks for its
+  passcode and then never opens a connection.
+* Watch sysdiagnose from 22:21:48 is attached. `remotepairingdeviced` starts pairing normally at 22:21:34.000
+  (`lockdownShouldDisableDevicePairing: NO`), but the archive has no log lines from any process between 22:21:34.1 and
+  22:21:48, so the watch side of the close (Mac: 22:21:41.344) is missing.
+
+Timeline and sanitized logs: `logs/remotepairingd-excerpts.md` § F–I in the repository.
+
 Repository with the full write-up: https://github.com/kisnner26/watchos27-pairing-bug

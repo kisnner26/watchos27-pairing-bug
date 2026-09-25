@@ -2,6 +2,22 @@
 
 Newest first. Times are local (UTC−6).
 
+## 2026-09-24 (night): the pairing loop
+
+* **How watches pair:** the watch connects *to* the Mac's `_remotepairing-pairable-host._tcp` listener, which exists only while
+  Device Hub's *Pair Nearby Device…* sheet is open; the sheet closes itself ~300–400 ms after setup. See logs § F.
+* **Keeping the Mac listening** ([`tools/watch-pair-keeper.sh`](../tools/watch-pair-keeper.sh), listener gap 0.6 s): the watch
+  **came back 23 s later, but asked for a brand-new pair-setup** (`startNewSession: true, setupManualPairing`) instead of
+  pair-verify. After that second setup it closed again (+286 ms). The fault is on the watch: it does not keep, or does not use,
+  the pairing it just completed. See logs § G.
+* **Watch sysdiagnose** (22:21:48) collected. The watch's pairing starts normally (Find My does not block it), but its log
+  has no lines at all between 22:21:34.1 and 22:21:48, so the reason for the close is not recorded. See logs § H.
+* *Unpair this device* for the Mac in the watch's Developer settings, then re-pairing: same result (had already been tried before).
+* **pymobiledevice3 11.19.1 `remote pair-host`** as an independent host: the watch lists it and asks for its passcode, but never
+  opens a TCP connection, over IPv4 or IPv6 ([`tools/pair_host_dualstack.py`](../tools/pair_host_dualstack.py)). See logs § I.
+* **Conclusion so far:** nothing on the Mac side fixes it. Waiting for a new watchOS / Xcode build; the pairing-loop evidence
+  was prepared as a follow-up to FB24924229.
+
 ## 2026-09-24 (report filed)
 
 * Filed in Feedback Assistant as **FB24924229** (Xcode ▸ Incorrect/Unexpected Behaviour), with a macOS sysdiagnose attached automatically.

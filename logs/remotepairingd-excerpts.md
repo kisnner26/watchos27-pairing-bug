@@ -119,3 +119,66 @@ $ dns-sd -B _remotepairing._tcp local.
 $ dns-sd -B _remotepairing-manual-pairing._tcp local.
 (no results)
 ```
+
+## F. Watches pair *into* the Mac, and the Mac only listens while the sheet is open (2026-09-24, night)
+
+For an iPhone the Mac finds the device (`_remotepairing._tcp`). For the watch it is the other way round:
+the watch connects to the Mac's `_remotepairing-pairable-host._tcp` listener, which `remotepairingd` only runs
+while Device Hub's *Pair Nearby Device…* sheet is open. The sheet closes itself right after setup:
+
+```
+22:21:16.352 remotepairingd  [deviceinitiatedpairinghostservice] Started listening for network pairing   <-- sheet opened
+22:21:41.314 remotepairingd  tcp-79: Pairing session of kind … setupManualPairing succeeded
+22:21:41.344 remotepairingd  tcp-79: received error reading message                                    <-- +30 ms
+22:21:41.345 remotepairingd  [deviceinitiatedpairinghostservice] Network pairing peers updated. Total count: 0
+22:21:41.663 DeviceHub       Beaconing pairing session explicitly ended by client                      <-- listener gone
+```
+
+So "the watch does not advertise `_remotepairing._tcp`" is probably by design, not the bug.
+
+## G. Keeping the Mac listening: the watch comes back, but asks for a *new* pairing
+
+Using [`tools/watch-pair-keeper.sh`](../tools/watch-pair-keeper.sh) the sheet was reopened automatically,
+so the Mac stopped listening for only ~0.6 s:
+
+```
+22:53:00.613 remotepairingd  Pairing session of kind … setupManualPairing succeeded   (00008310-…)
+22:53:00.918 DeviceHub       Beaconing pairing session explicitly ended by client     <-- +304 ms
+22:53:01.533 remotepairingd  Started listening for network pairing                    <-- gap 615 ms
+22:53:23.502 remotepairingd  Network pairing peers updated. Total count: 1            <-- THE WATCH COMES BACK
+22:53:23.558 remotepairingd  tcp-91: … PairingData(startNewSession: true, kind: setupManualPairing …)
+22:53:23.559 DeviceHub       Presenting pairing challenge for "<watch name>"          <-- a new code is asked for
+22:53:31.494 remotepairingd  tcp-91: Received pairing data from peer                  (M3: code entered)
+22:53:33.642 remotepairingd  tcp-91: Pairing session of kind … setupManualPairing succeeded   (00008310-…)
+22:53:33.928 remotepairingd  tcp-91 (00008310-…): authenticated -> invalidated        <-- +286 ms, same as before
+(no verifyManualPairing for 00008310-… afterwards; the verify at 22:53:59 was the iPad, 00008103-…)
+```
+
+The watch **does** reconnect when the Mac is listening, but it starts pair-*setup* from scratch instead of
+pair-*verify*. It behaves as if it had not kept (or does not use) the pairing it completed 23 seconds earlier.
+An earlier manual version of this test (listener gap 15 s, 22:46–22:47) saw no reconnect within 40 s.
+
+## H. Watch-side logs (watch sysdiagnose, 22:21:48)
+
+`remotepairingdeviced` on the watch starts the pairing normally:
+
+```
+22:21:33.735 remotepairingdeviced  pairablehost-0: Received request to wirelessly pair from peer
+22:21:33.742 remotepairingdeviced  pairablehost-0: Available over bonjour -> Establishing control channel
+22:21:33.968 remotepairingdeviced  [C1 IPv6#… ] ready (interface: en0[802.11], LQM: good)
+22:21:34.000 remotepairingdeviced  pairablehost-0: Initating pairing -> Manual pairing in progress
+22:21:34.001 remotepairingdeviced  [FMDFMIPManager lockdownShouldDisableDevicePairing] : NO
+```
+
+After 22:21:34.1 the archive has **no lines from any process** until the sysdiagnose starts (22:21:48),
+so the watch side of the close at 22:21:41 is not recorded. The same archive has three `forceReset … panic: btn_rst`
+reports (22:05, 22:11, 22:20), most likely from holding the buttons during earlier sysdiagnose attempts (not confirmed).
+
+## I. An independent host (pymobiledevice3 11.19.1 `remote pair-host`)
+
+pymobiledevice3 can advertise itself as a pairable host. On the watch it appears under
+*Settings ▸ Developer ▸ Paired Macs ▸ Other Devices*; tapping *Pair* asks for the watch passcode, and then **nothing
+happens: the watch never opens a TCP connection** (checked on the listener side). Same result with
+[`tools/pair_host_dualstack.py`](../tools/pair_host_dualstack.py), which also listens on and advertises IPv6 link-local
+like `remotepairingd` does. Device Hub additionally runs a "beaconing" session that pymobiledevice3 does not;
+whether the watch needs it is unknown.
