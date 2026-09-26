@@ -2,6 +2,25 @@
 
 Newest first. Times are local (UTC−6).
 
+## 2026-09-25 (community research, more attempts)
+
+* **Developer forums and GitHub searched** — see [`community-findings.md`](community-findings.md). An Apple DTS engineer acknowledged a
+  possible regression in this area (Xcode/watchOS 26.2) and asked for logging-profile reports; two forum threads report fixes for
+  *Xcode 27 beta 3*: pairing with the **iPhone powered off**, and **starting the pairing from the watch**. No one shared Feedback IDs.
+* **FB24924229:** still *Submitted*, no reply from Apple two days after filing.
+* **Mac on the iPhone's Personal Hotspot** (`172.20.10.x`): a network scan showed only the iPhone and the Mac — the **watch was not
+  on that network**, so this does not test anything. Likely cause: a watch does not join the hotspot of the iPhone it is paired with
+  (a guess, not verified).
+* **All three devices on the same 2.4 GHz network, with the watch's private Wi-Fi address off:** the watch was still not detected. The only
+  `_remotepairing._tcp` advertisers were the iPhone and the iPad (an "extra" instance that appeared turned out to be the iPad, and later the iPhone).
+* **Developer Mode** re-enabled on the watch and the pairing sheet opened: no change.
+* **Install from the iPhone Watch app** stalls at about half again. A syslog capture during the install could not be taken because
+  the iPhone was not on USB (no data collected).
+* **Reading this together with the pairing-loop finding below:** the watch not advertising `_remotepairing._tcp` is probably normal
+  (watches connect *to* the Mac's pairable-host listener), so "not detected on Bonjour" was never a valid test by itself.
+* **Not tried yet:** pairing with the iPhone powered off; starting the pairing from the watch (*Developer Mode ▸ paired devices*);
+  re-pairing the watch to the iPhone as a new watch.
+
 ## 2026-09-24 (night): the pairing loop
 
 * **How watches pair:** the watch connects *to* the Mac's `_remotepairing-pairable-host._tcp` listener, which exists only while

@@ -4,6 +4,8 @@
 
 > **Status: open · the fault is on the watch.** Last updated 2026-09-25.
 > **Reported to Apple:** Feedback Assistant **FB24924229** (2026-09-24). If you hit the same problem, please file your own report and mention that number.
+> **2026-09-25:** no reply from Apple yet. New: other developers report this family of problems on Xcode 27 betas, and two forum threads describe fixes
+> (pair with the **iPhone powered off**; **start the pairing from the watch**). See [`docs/community-findings.md`](docs/community-findings.md).
 > Retested after updating the watch (**watchOS 27.2, build 24S5091f**): same behavior. See [`docs/status-log.md`](docs/status-log.md).
 >
 > 🆕 **New (2026-09-24, night):** when the Mac is kept listening, the watch **does come back — but asks for a brand-new pairing**
@@ -159,6 +161,20 @@ Nothing on the Mac side fixed it. The only untried step is erasing the watch; ot
 * [`tools/watch-pair-keeper.sh`](tools/watch-pair-keeper.sh) — reopens Device Hub's pairing sheet right after setup and reports
   whether the watch reconnected (needs Accessibility permission for the terminal).
 * [`tools/pair_host_dualstack.py`](tools/pair_host_dualstack.py) — pymobiledevice3 pairable host on IPv4 + IPv6.
+
+## Community findings (2026-09-25)
+
+* An Apple DTS engineer acknowledged a possible Xcode / watchOS 26.2 regression in the
+  [Apple Developer Forums](https://developer.apple.com/forums/thread/813066) and asked for Feedback reports with logging profiles;
+  no Feedback IDs were shared there.
+* Two Xcode 27 beta threads report fixes worth trying: pairing with the **iPhone powered off**
+  ([thread](https://developer.apple.com/forums/thread/837517)), and **starting the pairing from the watch** under
+  *Developer Mode ▸ paired devices* ([thread](https://developer.apple.com/forums/thread/829704)).
+* No other public GitHub issue about this exact behavior was found; the closest is a tvOS 27 tool where pairing "succeeds" but the device is never
+  registered ([bitxeno/atvloadly#121](https://github.com/bitxeno/atvloadly/issues/121)).
+* Also tested here without success: 2.4 GHz for all devices, private Wi-Fi address off, Mac on the iPhone's hotspot (the watch never joined it).
+
+Details and sources: [`docs/community-findings.md`](docs/community-findings.md).
 
 ## Reproduce / gather evidence
 

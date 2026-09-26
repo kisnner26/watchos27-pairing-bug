@@ -18,6 +18,11 @@ Everything below was done with the symptoms described in the [README](../README.
 | Update the watch to watchOS 27.2 (24S5091f) | ✅ done (confirmed in Settings ▸ General ▸ About); re-pairing shows the same result: no reconnect |
 | Re-pair the **iPhone** after the privacy reset (control) | ✅ works: setup → reconnect (`verifyManualPairing`) → available |
 
+| Watch's **private Wi-Fi address** off | ✅ done; no change |
+| **2.4 GHz** network for Mac, iPhone and watch | ✅ done; the watch is still not detected |
+| Mac on the iPhone's **Personal Hotspot** (watch in the same hotspot) | ✅ the watch never appeared on that network (a watch likely cannot join its own iPhone's hotspot — unverified) |
+| Developer Mode re-enabled, pairing sheet opened again (2026-09-25) | ✅ no change |
+
 ## Mac
 
 | Attempt | Result |
@@ -52,7 +57,15 @@ Everything below was done with the symptoms described in the [README](../README.
 * Bundle versions of iPhone app and watch app made identical (they were not at first).
 * Debug build replaced by Release build (no `*.debug.dylib` / preview dylib in the watch bundle).
 
-## Not yet tried
+## Not yet tried (from the forums — see [`community-findings.md`](community-findings.md))
+
+* **Power the iPhone completely off** and pair from Device Hub (fix reported on Xcode 27 beta 3).
+* **Start the pairing from the watch**: *Developer Mode ▸ paired devices ▸ "Pair with MacBook"*, then match the codes.
+* Unpair the watch from the iPhone and set it up again **as a new watch**.
+* A phone hotspot from **another** phone.
+* File the watch sysdiagnose and CoreDevice logging-profile logs the Apple engineer asked for.
+
+## Not yet tried (earlier list)
 
 * Erase the watch (*Erase Apple Watch Content and Settings*) and set it up again — the only thing that clears all of the
   watch's pairing state; heavy, and may not help if this is a beta bug.

@@ -4,6 +4,8 @@
 
 > **Estado: abierto · la falla está en el reloj.** Última actualización: 2026-09-25.
 > **Reportado a Apple:** Feedback Assistant **FB24924229** (2026-09-24). Si te pasa lo mismo, abre tu propio reporte y menciona ese número.
+> **2026-09-25:** Apple aún no ha respondido. Novedad: otros desarrolladores reportan este tipo de fallos en las betas de Xcode 27, y dos hilos del foro describen soluciones
+> (emparejar con el **iPhone apagado**; **iniciar el emparejamiento desde el reloj**). Ver [`docs/community-findings.md`](docs/community-findings.md).
 > Se repitió la prueba tras actualizar el reloj (**watchOS 27.2, compilación 24S5091f**): mismo comportamiento. Ver [`docs/status-log.md`](docs/status-log.md).
 >
 > 🆕 **Nuevo (2026-09-24, noche):** si la Mac sigue escuchando, el reloj **sí vuelve, pero pide un emparejamiento nuevo**
@@ -116,6 +118,20 @@ Nada del lado de la Mac lo arregló. Lo único sin probar es borrar el reloj; si
 * [`tools/watch-pair-keeper.sh`](tools/watch-pair-keeper.sh) — reabre la ventana de emparejamiento de Device Hub justo después
   del setup e indica si el reloj se reconectó (necesita permiso de Accesibilidad para la terminal).
 * [`tools/pair_host_dualstack.py`](tools/pair_host_dualstack.py) — host emparejable de pymobiledevice3 por IPv4 + IPv6.
+
+## Hallazgos de la comunidad (2026-09-25)
+
+* Un ingeniero de soporte técnico de Apple reconoció una posible regresión de Xcode / watchOS 26.2 en los
+  [foros de desarrolladores de Apple](https://developer.apple.com/forums/thread/813066) y pidió reportes con perfiles de registro;
+  nadie compartió números de Feedback ahí.
+* Dos hilos de betas de Xcode 27 mencionan soluciones que vale la pena probar: emparejar con el **iPhone apagado**
+  ([hilo](https://developer.apple.com/forums/thread/837517)) y **iniciar el emparejamiento desde el reloj**, en
+  *Modo de desarrollador ▸ dispositivos emparejados* ([hilo](https://developer.apple.com/forums/thread/829704)).
+* No se encontró otro issue público en GitHub con este comportamiento exacto; el más parecido es una herramienta para tvOS 27 donde el emparejamiento «funciona» pero el
+  dispositivo nunca se registra ([bitxeno/atvloadly#121](https://github.com/bitxeno/atvloadly/issues/121)).
+* También se probó sin éxito: red de 2,4 GHz para todos, dirección Wi-Fi privada apagada y la Mac en el punto de acceso del iPhone (el reloj nunca se unió).
+
+Detalles y fuentes: [`docs/community-findings.md`](docs/community-findings.md) (en inglés).
 
 ## Reporte a Apple
 
