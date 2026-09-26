@@ -13,11 +13,9 @@ Everything below was done with the symptoms described in the [README](../README.
 | iPhone Bluetooth off (Settings ▸ Bluetooth, to push the watch onto Wi-Fi) | ✅ no change |
 | iPhone Bluetooth back on | ✅ no change |
 | Watch on the same Wi-Fi network / band as the Mac | ✅ no change |
-| Personal Hotspot from the iPhone for all three devices | not tested |
 | *Reset Location & Privacy* on the iPhone (clears trusted computers) | ✅ done; effect pending |
 | Update the watch to watchOS 27.2 (24S5091f) | ✅ done (confirmed in Settings ▸ General ▸ About); re-pairing shows the same result: no reconnect |
 | Re-pair the **iPhone** after the privacy reset (control) | ✅ works: setup → reconnect (`verifyManualPairing`) → available |
-
 | Watch's **private Wi-Fi address** off | ✅ done; no change |
 | **2.4 GHz** network for Mac, iPhone and watch | ✅ done; the watch is still not detected |
 | Mac on the iPhone's **Personal Hotspot** (watch in the same hotspot) | ✅ the watch never appeared on that network (a watch likely cannot join its own iPhone's hotspot — unverified) |
@@ -63,7 +61,7 @@ Everything below was done with the symptoms described in the [README](../README.
 * **Start the pairing from the watch**: *Developer Mode ▸ paired devices ▸ "Pair with MacBook"*, then match the codes.
 * Unpair the watch from the iPhone and set it up again **as a new watch**.
 * A phone hotspot from **another** phone.
-* File the watch sysdiagnose and CoreDevice logging-profile logs the Apple engineer asked for.
+* Attach the (already collected) watch sysdiagnose to FB24924229, and record the CoreDevice logging-profile logs the Apple DTS engineer asked for in the forum thread.
 
 ## Not yet tried (earlier list)
 
