@@ -2,6 +2,12 @@
 
 Newest first. Times are local (UTC−6).
 
+## 2026-09-28
+
+* **FB24924229:** checked in Feedback Assistant — still *Submitted*, no reply. Nothing in *Requests* (where a
+  DTS engineer's follow-up questions would show) and nothing about it in *Inbox* (only unrelated Apple News items).
+  4 days since filing, 3 days since the last check on 2026-09-25.
+
 ## 2026-09-25 (community research, more attempts)
 
 * **Developer forums and GitHub searched** — see [`community-findings.md`](community-findings.md). An Apple DTS engineer acknowledged a
