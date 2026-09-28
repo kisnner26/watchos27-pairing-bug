@@ -7,6 +7,11 @@ Newest first. Times are local (UTC−6).
 * **FB24924229:** checked in Feedback Assistant — still *Submitted*, no reply. Nothing in *Requests* (where a
   DTS engineer's follow-up questions would show) and nothing about it in *Inbox* (only unrelated Apple News items).
   4 days since filing, 3 days since the last check on 2026-09-25.
+* **Re-checked the community angle.** New post in Apple Developer Forums thread 813066 (19h old at check time): a different
+  user hitting a related-but-distinct failure (legacy companion pairing through an old iPhone/watch that can't update to
+  watchOS 27, not the manual/Device Hub path this report is about). No new replies on the other three threads. A fresh,
+  noise-free GitHub search (`remotepairingd watch`) found nothing new. **Correction:** bitxeno/atvloadly#121 is still open,
+  not closed as previously noted here — see [`community-findings.md`](community-findings.md) for the full correction.
 
 ## 2026-09-25 (community research, more attempts)
 

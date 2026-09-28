@@ -12,6 +12,12 @@ nothing here has been confirmed on the affected machine unless it says so in [`w
 | [Apple Watch does not appear in Xcode 27 Beta and Developer Mode option is missing](https://developer.apple.com/forums/thread/829704) | macOS 27 beta, Xcode 27 beta | Reported fix: re-pair the watch to the iPhone as a **new watch**, use Device Hub ▸ add ▸ nearby device (this is what made Developer Mode appear), then on the watch open *Developer Mode ▸ paired devices* and wait for a **"Pair with MacBook"** button — **start the pairing from the watch**, and match the codes on both screens. |
 | [Why doesn't iPhone 13 Pro Max and Watch Series 11 connect to Xcode 27.0?](https://developer.apple.com/forums/thread/847308) | Xcode 27.0 | Same complaint, no replies yet. |
 
+**Update 2026-09-28** — new post in thread 813066: **ejc3** (Xcode 27.0, watchOS 26.6, watch too old for watchOS 27) hits a
+*different* failure in the same family — the legacy companion-pairing-through-iPhone path (not the manual/Device Hub path
+this repo documents), failing with `Could not pair with the device: 0xe8000096` /
+`kAMDPairingDialogResponsePendingError`. Different error, different code path, but the same underlying picture: Apple Watch
+pairing is broken across multiple flows on Xcode 27. No new replies on the other three threads (837517, 829704, 847308).
+
 Workarounds mentioned in thread 813066 (mixed reports, none tied specifically to this bug): a 2.4 GHz network for all three
 devices, a phone hotspot, turning Bluetooth off on the iPhone, restarting Mac → iPhone → watch in that order, turning the
 Wi-Fi private address off on the watch, and toggling Developer Mode off → restart → on → restart.
@@ -23,8 +29,10 @@ watchOS 27 / Xcode 27 + Apple Watch found **no other public issue about this exa
 "27" as an issue number, so a phrase-only search returns noise; a report could exist under different wording.)
 
 The closest symptom is [bitxeno/atvloadly#121](https://github.com/bitxeno/atvloadly/issues/121): on **tvOS 27**, pairing "succeeds"
-(`remotepairing_udid` is written) but the device is never registered afterwards. That is a third-party tool, not Xcode, and
-it was closed on 2026-09-23 with *"It's been fixed"* and no explanation. It may point to the same tvOS/watchOS 27 change in the
+(`remotepairing_udid` is written) but the device is never registered afterwards. That is a third-party tool, not Xcode.
+**Correction (2026-09-28):** an earlier revision of this note said the issue was closed with "It's been fixed" — re-checked,
+and it is still **open**; one commenter said *"It's been fixed. I was able to pair my Apple TV 4K 2nd gen…"* with no technical
+detail and no reply from the maintainer, so treat that as unverified. It may point to the same tvOS/watchOS 27 change in the
 remote-pairing flow, but that is a guess.
 
 ## Feedback Assistant
