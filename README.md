@@ -4,6 +4,7 @@
 
 > **Status: open · the fault is on the watch.** Last updated 2026-09-28.
 > **Reported to Apple:** Feedback Assistant **FB24924229** (2026-09-24). If you hit the same problem, please file your own report and mention that number.
+> **Discussion:** [Apple Developer Forums thread](https://developer.apple.com/forums/thread/848740) — post your Feedback ID there too, so Apple can link duplicates.
 > **2026-09-28:** still no reply from Apple (4 days since filing). **2026-09-25:** other developers report this family of problems on Xcode 27 betas, and two forum threads describe fixes
 > (pair with the **iPhone powered off**; **start the pairing from the watch**). See [`docs/community-findings.md`](docs/community-findings.md).
 > Retested after updating the watch (**watchOS 27.2, build 24S5091f**): same behavior. See [`docs/status-log.md`](docs/status-log.md).

@@ -12,6 +12,9 @@ Newest first. Times are local (UTC−6).
   watchOS 27, not the manual/Device Hub path this report is about). No new replies on the other three threads. A fresh,
   noise-free GitHub search (`remotepairingd watch`) found nothing new. **Correction:** bitxeno/atvloadly#121 is still open,
   not closed as previously noted here — see [`community-findings.md`](community-findings.md) for the full correction.
+* **Posted our own report** in the Apple Developer Forums, as its own topic (not a reply, to keep it independently
+  searchable): https://developer.apple.com/forums/thread/848740. Summarizes the symptom, the pairing-loop finding, everything
+  tried, and links back to this repo and FB24924229; asks anyone hitting the same symptom to share their Feedback ID.
 
 ## 2026-09-25 (community research, more attempts)
 

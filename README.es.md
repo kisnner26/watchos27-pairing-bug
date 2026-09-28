@@ -4,6 +4,7 @@
 
 > **Estado: abierto · la falla está en el reloj.** Última actualización: 2026-09-28.
 > **Reportado a Apple:** Feedback Assistant **FB24924229** (2026-09-24). Si te pasa lo mismo, abre tu propio reporte y menciona ese número.
+> **Discusión:** [hilo en Apple Developer Forums](https://developer.apple.com/forums/thread/848740) — postea tu Feedback ID ahí también, para que Apple pueda vincular duplicados.
 > **2026-09-28:** Apple sigue sin responder (4 días desde el reporte). **2026-09-25:** otros desarrolladores reportan este tipo de fallos en las betas de Xcode 27, y dos hilos del foro describen soluciones
 > (emparejar con el **iPhone apagado**; **iniciar el emparejamiento desde el reloj**). Ver [`docs/community-findings.md`](docs/community-findings.md).
 > Se repitió la prueba tras actualizar el reloj (**watchOS 27.2, compilación 24S5091f**): mismo comportamiento. Ver [`docs/status-log.md`](docs/status-log.md).
