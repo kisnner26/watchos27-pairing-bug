@@ -2,7 +2,8 @@
 
 🇬🇧 [Read in English](README.md)
 
-> **Estado: abierto · la falla está en el reloj.** Última actualización: 2026-09-28.
+> **Estado: resuelto en mi equipo (2026-10-03) · solución: actualizar el iPhone a iOS 27.2 para que coincida con el reloj.** El reporte a Apple sigue abierto; la causa raíz no está probada.
+> Ver [`docs/resolution.es.md`](docs/resolution.es.md): qué lo arregló, la evidencia en los logs del iPhone y lo que no demuestra. El texto de abajo es la investigación original (última actualización: 2026-09-28).
 > **Reportado a Apple:** Feedback Assistant **FB24924229** (2026-09-24). Si te pasa lo mismo, abre tu propio reporte y menciona ese número.
 > **Discusión:** [hilo en Apple Developer Forums](https://developer.apple.com/forums/thread/848740) — postea tu Feedback ID ahí también, para que Apple pueda vincular duplicados.
 > **2026-09-28:** Apple sigue sin responder (4 días desde el reporte). **2026-09-25:** otros desarrolladores reportan este tipo de fallos en las betas de Xcode 27, y dos hilos del foro describen soluciones

@@ -2,6 +2,12 @@
 
 Newest first. Times are local (UTC−6).
 
+## 2026-10-03 (resolved)
+
+* The watch worked again after updating the **iPhone** from iOS 27.0 to **27.2** (OTA completed 00:26) and pairing the watch from Device Hub.
+  Re-pairing the watch in the Watch app on iOS 27.0 (2026-10-02 night) had not been enough. While failing, Device Hub showed `DeviceKitError 4002`.
+* The iPhone's analytics logs confirm the timeline and a healthy iPhone ↔ watch pairing throughout. Details and limits in [resolution.md](resolution.md).
+
 ## 2026-09-28
 
 * **FB24924229:** checked in Feedback Assistant — still *Submitted*, no reply. Nothing in *Requests* (where a

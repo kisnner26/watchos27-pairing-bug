@@ -2,7 +2,8 @@
 
 🇪🇸 [Leer en español](README.es.md)
 
-> **Status: open · the fault is on the watch.** Last updated 2026-09-28.
+> **Status: resolved on my setup (2026-10-03) · fix: update the iPhone to iOS 27.2 to match the watch.** The report to Apple is still open; the root cause is not proven.
+> See [`docs/resolution.md`](docs/resolution.md) for what fixed it, the iPhone log evidence and what it does not show. The write-up below is the original investigation (last updated 2026-09-28).
 > **Reported to Apple:** Feedback Assistant **FB24924229** (2026-09-24). If you hit the same problem, please file your own report and mention that number.
 > **Discussion:** [Apple Developer Forums thread](https://developer.apple.com/forums/thread/848740) — post your Feedback ID there too, so Apple can link duplicates.
 > **2026-09-28:** still no reply from Apple (4 days since filing). **2026-09-25:** other developers report this family of problems on Xcode 27 betas, and two forum threads describe fixes
@@ -31,7 +32,7 @@ Feedback Assistant report. Personal identifiers (UDIDs, device names, network ad
 |---|---|
 | Mac | MacBook Pro (`MacBookPro17,1`, Apple M1), macOS 27.2 (`26B5086k`) |
 | Xcode | 27.0 (`27A5237l`) — Devices are now managed by the separate **Device Hub** app |
-| iPhone | iPhone 15 Pro Max (`iPhone16,2`), iOS 27.0 |
+| iPhone | iPhone 15 Pro Max (`iPhone16,2`), iOS 27.0 → updated to **27.2 (24B5089g)**, which fixed it |
 | Watch | Apple Watch Ultra 2 (`Watch7,5`), watchOS 27.0 → updated to **27.2 (24S5091f)** |
 | Signing | Free Apple Developer account (Personal Team) |
 | Pairing | The watch is a *manually paired* device in CoreDevice (`Authentication Type: manualPairing`) |
@@ -155,7 +156,7 @@ See [`docs/what-i-tried.md`](docs/what-i-tried.md) for the full list.
 3. ~~The watch does not announce itself after setup.~~ Watches pair *into* the Mac's pairable-host listener; not advertising
    `_remotepairing._tcp` is probably by design.
 
-Nothing on the Mac side fixed it. The only untried step is erasing the watch; otherwise this needs a watchOS fix.
+Nothing on the Mac side fixed it. **Update 2026-10-03:** updating the *iPhone* to iOS 27.2 did; see [`docs/resolution.md`](docs/resolution.md).
 
 ## Tools
 
