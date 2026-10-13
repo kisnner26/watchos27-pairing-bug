@@ -2,7 +2,8 @@
 
 🇬🇧 [Read in English](README.md)
 
-> **Estado: resuelto en mi equipo (2026-10-03) · solución: actualizar el iPhone a iOS 27.2 para que coincida con el reloj.** El reporte a Apple sigue abierto; la causa raíz no está probada.
+> **Estado: resuelto en mi equipo (2026-10-03) · solución: dejar la Mac, el iPhone y el reloj en la misma versión (el iPhone era el único que seguía en iOS 27.0; al subirlo a 27.2 funcionó).** La causa raíz no está probada.
+> **2026-10-12:** Apple respondió a FB24924229 pidiendo logs del perfil de logging de CoreDevice y `devicectl diagnose`; respondí que ya no se reproduce. Ver [`docs/status-log.md`](docs/status-log.md).
 > Ver [`docs/resolution.es.md`](docs/resolution.es.md): qué lo arregló, la evidencia en los logs del iPhone y lo que no demuestra. El texto de abajo es la investigación original (última actualización: 2026-09-28).
 > **Reportado a Apple:** Feedback Assistant **FB24924229** (2026-09-24). Si te pasa lo mismo, abre tu propio reporte y menciona ese número.
 > **Discusión:** [hilo en Apple Developer Forums](https://developer.apple.com/forums/thread/848740) — postea tu Feedback ID ahí también, para que Apple pueda vincular duplicados.

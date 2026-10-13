@@ -2,7 +2,8 @@
 
 🇪🇸 [Leer en español](README.es.md)
 
-> **Status: resolved on my setup (2026-10-03) · fix: update the iPhone to iOS 27.2 to match the watch.** The report to Apple is still open; the root cause is not proven.
+> **Status: resolved on my setup (2026-10-03) · fix: put the Mac, iPhone and watch on the same release (the iPhone was the only one left on iOS 27.0; updating it to 27.2 fixed it).** The root cause is not proven.
+> **2026-10-12:** Apple answered FB24924229 asking for CoreDevice logging-profile logs and `devicectl diagnose`; I replied that it no longer reproduces. See [`docs/status-log.md`](docs/status-log.md).
 > See [`docs/resolution.md`](docs/resolution.md) for what fixed it, the iPhone log evidence and what it does not show. The write-up below is the original investigation (last updated 2026-09-28).
 > **Reported to Apple:** Feedback Assistant **FB24924229** (2026-09-24). If you hit the same problem, please file your own report and mention that number.
 > **Discussion:** [Apple Developer Forums thread](https://developer.apple.com/forums/thread/848740) — post your Feedback ID there too, so Apple can link duplicates.
