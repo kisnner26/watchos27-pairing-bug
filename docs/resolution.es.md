@@ -1,6 +1,6 @@
 # Resolución: actualizar el iPhone a iOS 27.2
 
-**Estado: resuelto en mi equipo (2026-10-03). La causa raíz no está probada.** El reporte a Apple (FB24924229) sigue abierto.
+**Estado: resuelto en mi equipo (2026-10-03). La causa raíz no está probada.** Apple respondió el 2026-10-12 pidiendo más diagnósticos (ver [status-log.md](status-log.md)); la respuesta ya está en el reporte.
 
 ## Qué lo arregló
 
@@ -13,9 +13,19 @@ Después el reloj volvió a estar disponible y `devicectl` pudo instalarle apps.
 
 Todo lo de [`what-i-tried.md`](what-i-tried.md), y dos cosas que conviene destacar:
 
-* **Actualizar solo el reloj** (watchOS 27.0 → 27.2). El iPhone siguió en iOS 27.0, así que el reloj quedó *más nuevo* que su compañero.
-* **Desvincular y volver a vincular el reloj en la app Watch** con el iPhone todavía en iOS 27.0. El enlace iPhone ↔ reloj estaba sano,
+* **Actualizar solo el reloj** (watchOS 27.0 → 27.2). El iPhone siguió en iOS 27.0, así que quedó como el único dispositivo atrasado.
+* **Resetear el reloj y volver a vincularlo** (mismo Apple ID) en la app Watch con el iPhone todavía en iOS 27.0. El enlace iPhone ↔ reloj estaba sano,
   pero Device Hub seguía sin poder llegar al reloj.
+
+## Versiones durante la falla
+
+| Fase | Mac | iPhone | Reloj | Resultado |
+|---|---|---|---|---|
+| 1: al reportar (2026-09-24, antes de actualizar el reloj) | macOS 27.2 | iOS 27.0 | watchOS 27.0 | falla |
+| 2: tras actualizar solo el reloj | macOS 27.2 | iOS 27.0 | watchOS 27.2 | falla (también tras el reseteo y re-emparejado, 2 oct) |
+| 3: tras actualizar el iPhone (3 oct, 00:26) | macOS 27.2 | iOS 27.2 | watchOS 27.2 | funciona |
+
+La primera versión de este documento decía que el reloj era "más nuevo que el iPhone". Eso solo describe la fase 2. Lo exacto es que los dispositivos estaban en versiones **distintas** en las dos fases con falla y en la **misma** versión cuando funcionó.
 
 Síntoma que mostraba Device Hub mientras fallaba:
 
@@ -51,15 +61,16 @@ Estado del reloj después (`devicectl device info details`): `pairingState: pair
 
 ## Qué muestra y qué no
 
-* Muestra que durante toda la falla el reloj (27.2) era **más nuevo que el iPhone (27.0)**, que el emparejado iPhone ↔ reloj estaba sano,
+* Muestra que durante toda la falla las versiones estaban mezcladas (el iPhone en 27.0 frente a una Mac en 27.2 y, después, también un reloj en 27.2), que el emparejado iPhone ↔ reloj estaba sano,
   y que la mejora coincide con subir el iPhone a 27.2, sin más re-emparejados del reloj después.
+* **No** separa la actualización del iPhone del nuevo emparejado en Device Hub hecho justo después, y no quedó registrado si el iPhone estaba por USB en ese momento. Se usó el mismo Apple ID siempre; no se probó otro. Es un solo caso y no se repitió.
 * **No** muestra el lado de CoreDevice. Los mensajes de `remotepairingd` y `verifyManualPairing` no se guardan en estos archivos y el log unificado de la Mac
   caduca en horas, así que el motivo por el que el reloj pedía un emparejamiento nuevo en bucle ([ver el bucle](README.es.md#el-bucle-de-emparejamiento)) sigue sin probarse.
   Un desajuste de versiones entre el iPhone y el reloj es la hipótesis de trabajo, no un diagnóstico.
 
 ## Si te pasa
 
-Comprueba antes que nada que el **iPhone y el reloj tengan versiones a juego** (iOS 27.2 con watchOS 27.2). Si sigue fallando, captura el log
+Comprueba antes que nada que la **Mac, el iPhone y el reloj tengan versiones a juego** (macOS 27.2, iOS 27.2 y watchOS 27.2). Si sigue fallando, captura el log
 **antes** de emparejar para no perder la evidencia:
 
 ```sh

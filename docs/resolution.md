@@ -1,6 +1,6 @@
 # Resolution: update the iPhone to iOS 27.2
 
-**Status: resolved on my setup (2026-10-03). Root cause not proven.** The Apple-side report (FB24924229) is still open.
+**Status: resolved on my setup (2026-10-03). Root cause not proven.** Apple replied on 2026-10-12 asking for more diagnostics (see [status-log.md](status-log.md)); the answer is in the report.
 
 ## What fixed it
 
@@ -13,9 +13,19 @@ After that the watch became available again and `devicectl` could install apps o
 
 Everything in [`what-i-tried.md`](what-i-tried.md), plus two things worth stressing:
 
-* **Updating only the watch** (watchOS 27.0 → 27.2). The iPhone stayed on iOS 27.0, so the watch ended up *newer* than its companion.
-* **Unpairing and re-pairing the watch in the Watch app** while the iPhone was still on iOS 27.0. The iPhone ↔ watch link was healthy,
+* **Updating only the watch** (watchOS 27.0 → 27.2). The iPhone stayed on iOS 27.0, so it was the only device left behind.
+* **Resetting the watch and pairing it again** (same Apple ID) in the Watch app while the iPhone was still on iOS 27.0. The iPhone ↔ watch link was healthy,
   but Device Hub still could not reach the watch.
+
+## Versions during the failure
+
+| Phase | Mac | iPhone | Watch | Result |
+|---|---|---|---|---|
+| 1: filing (2026-09-24, before the watch update) | macOS 27.2 | iOS 27.0 | watchOS 27.0 | fails |
+| 2: after updating only the watch | macOS 27.2 | iOS 27.0 | watchOS 27.2 | fails (also after the reset and re-pairing, 2 Oct) |
+| 3: after updating the iPhone (3 Oct, 00:26) | macOS 27.2 | iOS 27.2 | watchOS 27.2 | works |
+
+The first version of this document said the watch was "newer than the iPhone". That only describes phase 2. The accurate statement is that the devices were on **different** releases in both failing phases and on the **same** release when it worked.
 
 Symptom shown by Device Hub while it was failing:
 
@@ -51,15 +61,16 @@ State of the watch afterwards (`devicectl device info details`): `pairingState: 
 
 ## What this does and does not show
 
-* It shows that during the whole failure the watch (27.2) was **newer than the iPhone (27.0)**, that the iPhone ↔ watch pairing was healthy,
+* It shows that the devices were on mixed releases during the whole failure (the iPhone on 27.0 against a Mac on 27.2, and later also a watch on 27.2), that the iPhone ↔ watch pairing was healthy,
   and that the fix coincides with moving the iPhone to 27.2, with no further watch re-pairing afterwards.
+* It does **not** separate the iPhone update from the new Device Hub pairing done right after it, and whether the iPhone was on USB at that moment is not recorded. The same Apple ID was used throughout; no other ID was tried. It is one case and was not repeated.
 * It does **not** show the CoreDevice side. `remotepairingd` and `verifyManualPairing` messages are not kept in these files and the Mac's unified log
   expires within hours, so the reason the watch asked for a brand-new pair-setup in a loop ([see the loop](../README.md#the-pairing-loop)) is still unproven.
   A version mismatch between the companion iPhone and the watch is the working hypothesis, not a diagnosis.
 
 ## If you hit this
 
-Check that the **iPhone and the watch run matching OS versions** (iOS 27.2 with watchOS 27.2) before anything else. If it still fails, capture the log
+Check that the **Mac, iPhone and watch run matching OS versions** (macOS 27.2, iOS 27.2, watchOS 27.2) before anything else. If it still fails, capture the log
 **before** pairing, so the evidence is not lost:
 
 ```sh
