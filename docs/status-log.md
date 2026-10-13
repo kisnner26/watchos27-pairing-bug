@@ -2,6 +2,20 @@
 
 Newest first. Times are local (UTC−6).
 
+## 2026-10-12 (Apple replied; answered the same day)
+
+* **Apple's reply on FB24924229 (12 Oct, 6:17 PM):** the issue "appears to be a device disconnect" (unstable network or degraded cable). They ask for diagnostics from both the host
+  and the device, collected soon after the incident, ideally with the **CoreDevice logging profile** on both sides, plus `xcrun devicectl diagnose` and a sysdiagnose from each machine.
+  Feedback Assistant now lists the report as *Investigation complete — Unable to diagnose with current information*.
+* **What I did not have when it failed:** the CoreDevice logging profile and `devicectl diagnose` were never run (see [what-i-tried](what-i-tried.md)). The Mac sysdiagnose was attached at filing; the watch
+  sysdiagnose has no log lines between 22:21:34.1 and 22:21:48, where the channel closes.
+* **My reply (12 Oct, 10:12 PM):** it is no longer reproducible; the working hypothesis is a version mismatch across devices; the CoreDevice-side logs are gone, so it is a hypothesis and not a diagnosis;
+  the observable defect is the pair-setup loop instead of `verifyManualPairing`; I will send the profile logs and a full `devicectl diagnose` if it happens again. See [resolution.md](resolution.md).
+* **Versions during the failure (corrected):** the Mac was on macOS 27.2 the whole time. Phase 1 (24 Sep, before the watch update): iPhone and watch on 27.0, Mac on 27.2. Phase 2 (after the watch update): Mac and watch on 27.2, iPhone on 27.0.
+  Failed in both. It worked only when all three were on 27.2.
+* **Not isolated:** the watch was also reset and paired again (same Apple ID) on 2 Oct while the iPhone was still on 27.0, and it kept failing (DeviceKitError 4002); the successful pairing from Device Hub was done after the iPhone update, so the update and the new
+  Device Hub pairing cannot be separated. Whether the iPhone was on USB at that moment is not recorded. One case, not repeated.
+
 ## 2026-10-03 (resolved)
 
 * The watch worked again after updating the **iPhone** from iOS 27.0 to **27.2** (OTA completed 00:26) and pairing the watch from Device Hub.
