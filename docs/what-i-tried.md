@@ -55,6 +55,16 @@ Everything below was done with the symptoms described in the [README](../README.
 * Bundle versions of iPhone app and watch app made identical (they were not at first).
 * Debug build replaced by Release build (no `*.debug.dylib` / preview dylib in the watch bundle).
 
+## Done after the first version of this list
+
+* Watch reset and paired again (same Apple ID) in the Watch app with the iPhone on iOS 27.0 (2026-10-02): still failing, DeviceKitError 4002.
+* iPhone updated to iOS 27.2 (2026-10-03, 00:26) so that Mac, iPhone and watch were on 27.2, then the watch paired from Device Hub: **worked**. See [resolution.md](resolution.md).
+
+## Never done (Apple asked for these on 2026-10-12)
+
+* CoreDevice logging profile on the Mac, iPhone and watch.
+* `xcrun devicectl diagnose` right after a failure.
+
 ## Not yet tried (from the forums — see [`community-findings.md`](community-findings.md))
 
 * **Power the iPhone completely off** and pair from Device Hub (fix reported on Xcode 27 beta 3).

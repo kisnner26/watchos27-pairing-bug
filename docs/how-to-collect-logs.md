@@ -53,7 +53,21 @@ sudo /usr/bin/log collect --device --last 3m --output ~/iphone.logarchive
 Notes: `--device-udid <udid>` failed with `Device not configured (6)` on iOS 27; `--device` (first device on USB) worked.
 `idevicesyslog` (libimobiledevice) could not attach to an iOS 27 device.
 
-## 5. Before you share anything
+## 5. What Apple asked for (FB24924229, 2026-10-12)
+
+Do this **before** the first attempt, not after:
+
+1. Install the **CoreDevice** logging profile on the Mac, the iPhone and the watch: <https://developer.apple.com/bug-reporting/profiles-and-logs/?name=CoreDevice>
+2. Reproduce the failure.
+3. Right away, on the Mac:
+
+```sh
+xcrun devicectl diagnose
+```
+
+4. Check that the resulting tarball contains a sysdiagnose from the Mac **and** from the device; if one is missing, collect it by hand and attach it too.
+
+## 6. Before you share anything
 
 Logs contain UDIDs, device names and network addresses. Redact them (see
 [`logs/remotepairingd-excerpts.md`](../logs/remotepairingd-excerpts.md) for the style used here).
